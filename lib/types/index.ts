@@ -8,7 +8,7 @@ export interface FolderWithRelations extends Folder {
 }
 
 export interface ExcalidrawContent {
-  elements: ExcalidrawElement[];
+  elements: readonly ExcalidrawElement[];
   appState: AppState;
 }
 

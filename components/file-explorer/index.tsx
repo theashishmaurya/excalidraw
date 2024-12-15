@@ -61,7 +61,9 @@ export function FileExplorer({ initialFolders, onFileSelect }: FileExplorerProps
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => setCreatingIn({ id: 'root', type: 'folder' })}
+          onClick={() => {
+            setCreatingIn({ id: 'root', type: 'folder' })
+          }}
         >
           <Plus size={16} />
         </Button>
@@ -75,7 +77,8 @@ export function FileExplorer({ initialFolders, onFileSelect }: FileExplorerProps
           onToggle={toggleFolder}
           onFileSelect={onFileSelect}
           onCreateClick={(id, type) => setCreatingIn({ id, type })}
-        />
+          expandedFolders={new Set()}                 
+          />
       ))}
 
       {creatingIn && (

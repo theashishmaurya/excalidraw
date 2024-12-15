@@ -3,8 +3,10 @@
 import dynamic from 'next/dynamic';
 import { useExcalidraw } from './use-excalidraw';
 import type { File } from '@prisma/client';
+import type {  Collaborator, ExcalidrawImperativeAPI } from '@excalidraw/excalidraw/types/types';
+import { useEffect, useState } from 'react';
+import { ExcalidrawContent } from '@/lib/types';
 
-// Dynamically import Excalidraw to avoid SSR issues
 const Excalidraw = dynamic(
   async () => (await import('@excalidraw/excalidraw')).Excalidraw,
   {
@@ -17,7 +19,24 @@ interface ExcalidrawEditorProps {
 }
 
 export function ExcalidrawEditor({ file }: ExcalidrawEditorProps) {
-  const { elements, appState, onChange } = useExcalidraw(file);
+  const { elements, appState, onChange ,setElements,setAppState} = useExcalidraw(file);
+  const [excalidrawAPI, setExcalidrawAPI] = useState<ExcalidrawImperativeAPI|null>(null);
+
+
+  useEffect(()=>{
+    if(file){
+      const content = file.content as unknown as ExcalidrawContent;
+
+      excalidrawAPI?.updateScene({
+        elements:content.elements,
+        appState: content.appState  ? {...content.appState ,collaborators:[] as unknown as Map<string, Collaborator> } :undefined
+      })
+      setElements(content.elements ||[])
+      setAppState(content.appState || null)
+     
+    }
+    
+  },[file])
 
   if (!file) {
     return (
@@ -27,14 +46,19 @@ export function ExcalidrawEditor({ file }: ExcalidrawEditorProps) {
     );
   }
 
+
   return (
     <div className="w-full h-full">
       <Excalidraw
         initialData={{
           elements,
-          appState: appState || undefined,
+          appState: appState ? {...appState,collaborators:[] as unknown as Map<string, Collaborator> | undefined }: undefined,
+          scrollToContent:true
         }}
+        isCollaborating={false}
         onChange={onChange}
+        excalidrawAPI={(api) => setExcalidrawAPI(api)}
+        
       />
     </div>
   );
