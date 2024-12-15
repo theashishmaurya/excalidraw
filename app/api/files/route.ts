@@ -1,5 +1,7 @@
 import { prisma } from '@/lib/db';
 import { NextResponse } from 'next/server';
+export const dynamic = 'force-dynamic'; // Ensures the route is treated as dynamic
+
 
 export async function POST(request: Request) {
   try {
