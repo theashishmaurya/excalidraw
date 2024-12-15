@@ -2,13 +2,15 @@
 
 import { useState, useEffect, useRef } from 'react';
 import type { ExcalidrawElement } from '@excalidraw/excalidraw/types/element/types';
-import type { AppState, BinaryFiles } from '@excalidraw/excalidraw/types/types';
+import type { AppState, BinaryFiles, ExcalidrawImperativeAPI } from '@excalidraw/excalidraw/types/types';
 import type { File } from '@prisma/client';
 import { updateFileContent } from '@/lib/api/files';
 
 export function useExcalidraw(file: File | null,) {
   const [elements, setElements] = useState<readonly ExcalidrawElement[]>([]);
   const [appState, setAppState] = useState<AppState | null>(null);
+  const [excalidrawAPI, setExcalidrawAPI] = useState<ExcalidrawImperativeAPI|null>(null);
+
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const saveContent = async (elements: readonly ExcalidrawElement[], appState: AppState) => {
@@ -24,11 +26,14 @@ export function useExcalidraw(file: File | null,) {
 
   const handleChange = (
     elements: readonly ExcalidrawElement[],
-    appState: AppState,
+    appState:AppState,
     files: BinaryFiles
   ) => {
-    setElements(elements);
-    setAppState(appState);
+
+    const els = excalidrawAPI?.getSceneElements()
+    const app = excalidrawAPI?.getAppState()
+          
+    if(app && els) {
 
     // Clear the previous timeout
     if (debounceTimeout.current) {
@@ -37,8 +42,9 @@ export function useExcalidraw(file: File | null,) {
 
     // Set a new timeout for 5 seconds
     debounceTimeout.current = setTimeout(() => {
-      saveContent(elements, appState);
+      saveContent(els, app);
     }, 4000);
+  }
   };
 
   return {
@@ -47,5 +53,7 @@ export function useExcalidraw(file: File | null,) {
     onChange: handleChange,
     setElements,
     setAppState,
+    excalidrawAPI, 
+    setExcalidrawAPI
   };
 }

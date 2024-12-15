@@ -19,8 +19,7 @@ interface ExcalidrawEditorProps {
 }
 
 export function ExcalidrawEditor({ file }: ExcalidrawEditorProps) {
-  const { elements, appState, onChange ,setElements,setAppState} = useExcalidraw(file);
-  const [excalidrawAPI, setExcalidrawAPI] = useState<ExcalidrawImperativeAPI|null>(null);
+  const { elements, appState, onChange ,setElements,setAppState,setExcalidrawAPI,excalidrawAPI} = useExcalidraw(file);
 
 
   useEffect(()=>{
